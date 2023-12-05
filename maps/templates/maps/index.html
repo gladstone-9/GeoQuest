@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest | Quests</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+        <link rel="stylesheet" href="{% static 'maps/index/style.css' %}">
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        <div class="container w-75 py-5 ">
+            <div class="center d-inline-flex">
+                <a href="search">
+                    <div class="btn block-content-left">
+                        <div class="center-horizontal">
+                            <h2>Search</h2>
+                            <span class="desc">Browse our quest catalog</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="create">
+                    <div class="btn block-content-middle">
+                        <div class="center-horizontal">
+                            <h2>Create</h2>
+                            <span class="desc">Build your own adventure</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="leaderboard">
+                    <div class="btn block-content-right">
+                        <div class="center-horizontal">
+                            <h2>Leaderboard</h2>
+                            <span class="desc">See who's topping the charts</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% include "footer.html" %}
+    </body>
+</html>

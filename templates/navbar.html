@@ -1,0 +1,112 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="header-top">
+  <div class="container-fluid">
+    {% if '127.0.0.1' in request.build_absolute_uri %}
+    <a class="navbar-brand" href="http://127.0.0.1:8000/">GeoQuest</a>
+    {% else %}
+    <a class="navbar-brand" href="https://geoquest-b-12-5253c5014417.herokuapp.com/">GeoQuest</a>
+    {% endif %}
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if '127.0.0.1' in request.build_absolute_uri %}
+        <!--
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="http://127.0.0.1:8000/">Home</a>
+        </li>
+        -->
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="http://127.0.0.1:8000/about">About</a>
+        </li>
+        {% else %}
+        <!--
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="https://geoquest-b-12-5253c5014417.herokuapp.com/">Home</a>
+        </li>
+        -->
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="https://geoquest-b-12-5253c5014417.herokuapp.com/about">About</a>
+        </li>
+        {% endif %}
+        {% if user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link" href="/admin">Admin</a>
+        </li>
+        {% endif %}
+        {% if '127.0.0.1' in request.build_absolute_uri %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="http://127.0.0.1:8000/maps" id="navbarDropdownMenuLink"
+            data-bs-toggle="dropdown" role="button" aria-expanded="false">
+            Quests
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/">Explore</a>
+            <hr class="dropdown-divider">
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/search">Search</a>
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/create">Create</a>
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/leaderboard">Leaderboard</a>
+            {% if user.is_staff %}
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/approve">Approve Quests</a>
+            {% endif %}
+          </div>
+        </li>
+        {% else %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps"
+            id="navbarDropdownMenuLink" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+            Quests
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/">Explore</a>
+            <hr class="dropdown-divider">
+            <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/search">Search</a>
+            <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/create">Create</a>
+            <a class="dropdown-item"
+              href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/leaderboard">Leaderboard</a>
+            {% if user.is_staff %}
+            <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/approve">Approve
+              Quests</a>
+            {% endif %}
+          </div>
+          {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-bs-toggle="dropdown" role="button"
+            aria-expanded="false">
+            Account
+          </a>
+          {% if user.is_authenticated %}
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            {% if '127.0.0.1' in request.build_absolute_uri %}
+            <a class="dropdown-item" href="http://127.0.0.1:8000/maps/myQuests">My Quests</a>
+            {% else %}
+            <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/myQuests">My Quests</a>
+            {% endif %}
+            <hr class="dropdown-divider">
+            <a class="dropdown-item" href="{% url 'account_email' %}">Change Email</a>
+            <a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a>
+          </div>
+          {% else %}
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="{% url 'account_login' %}">Login</a>
+            <a class="dropdown-item" href="{% url 'account_signup' %}">Sign Up</a>
+          </div>
+          {% endif %}
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/forum">Forum</a>
+      </li>
+      </ul>
+      
+      <div class="navbar-nav ml-auto">
+        <a class="nav-item nav-link" href="{% url 'forum_search:search' %}">Advanced search</a>
+      </div>
+      <form class="d-flex" role="search" action="{% url 'forum_search:search' %}">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+      
+    </div>
+  </div>
+</nav>

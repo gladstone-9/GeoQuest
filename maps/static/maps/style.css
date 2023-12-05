@@ -1,0 +1,55 @@
+body {
+    background-image: linear-gradient(to right top, #051937, #004d7a, #008793, #00bf72, #a8eb12);
+    min-height: 100vh;
+    background-attachment: fixed;
+}
+
+#map {
+    width: 60vh;
+    height: 70vh;
+}
+
+#map2 {
+    width: 140vh;
+    height: 70vh;
+}
+
+#search_map {
+    height: 90%;
+}
+
+#floating-panel {
+    /* position: relative; */
+    top: 10px;
+    left: 25%;
+    z-index: 5;
+    background-color: #fff;
+    padding: 0.3rem;
+    border: 0.06rem solid #999;
+    text-align: center;
+    font-family: "Roboto", "sans-serif";
+    line-height: 1.9rem;
+    padding-left: 0.625rem;
+  }
+
+.uneditable-ui {
+    background-color: #cbcbcb; /* Set the background color to gray */
+    /* color: #ffffff; Set the text color to a lighter gray */
+    cursor: no-drop; /*Change the cursor to indicate the field is not editable*/
+}
+
+.btn-2 {
+    border-radius: 0.3rem;
+    padding: 0.5rem 1.25rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    background-color: #051937;
+}
+
+.btn-2:hover {
+    color: #00bf72;
+}

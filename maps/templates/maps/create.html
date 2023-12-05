@@ -1,0 +1,368 @@
+<!-- Do not realign this page or it will break lol. -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load widget_tweaks %}
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest | Create</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+        </script>
+
+        <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+        <link rel="stylesheet" href="{% static 'maps/create/style.css' %}">
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        <div class="container w-100 py-5 d-flex justify-content-between align-items-center">
+            {% if user.is_authenticated %}
+            <div class="createPoints mr-5">
+
+                <button class="btn-3 toggleModal"><i class="fa fa-info-circle" style="font-size: 24px"></i></button>
+                <div class="modal-info"> 
+                    <header>
+                        <h2>Guide to Creating a Quest</h2>
+                        <button class="close toggleModal">x</button>
+                    </header>
+                    
+                    <section>
+                        <p>In order to create a quest, first add a title and select the type of cache. Next, zoom and scroll through the map while clicking to place pinpoints for each location in your quest. As you do so, fields will open in the Location List for you to fill out. If you wish to remove a marker, simply click on it to remove it from the map. Once you are done filling in all the input fields, click the "Create Quest" button to publish your quest. Happy trails!</p>
+                    </section>
+                </div>
+
+
+                {% for message in messages %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+                {% else %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+                {% endif %}
+                {% endfor %}
+                <h2>Create Quest</h2> 
+                <form class="pb-3" id="form-container" method="post">
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors | safe }}
+                    <input type="hidden" name="remember" value="true" />
+
+                    <div class="form-group">
+                        <label for="title" class="form-label">Quest Title</label>
+                        {% render_field form.title placeholder="Title" id="title" name="title" type="text" autocomplete="title" required=True class="form-input" %}
+                        {{ form.title.errors | safe }}
+
+                        <label for="type" class="form-label">Cache Type</label>
+                        {% render_field form.cache_type placeholder="Type" id="type" name="type" type="text" autocomplete="type" required=True class="form-input" %}
+                        {{ form.cache_type.errors | safe }}
+                    </div>
+
+                    <h5 class="pt-3">Location List</h5>
+                    {{ location_formset.non_form_errors }}
+                    {{ location_formset.management_form }}
+                    <div id="all-location-forms" class="locationInput">
+                        {% for form in location_formset %}
+                        <div id="quest-0" class="questForm">
+                            <hr>
+                            <label for="location-title" class="form-label">Title</label>
+                            {% render_field form.title placeholder="Title" id="location-title" name="location-title" type="text" autocomplete="title" required=True class="form-input" %}
+                            {{ form.title.errors | safe }}
+
+                            <label for="description" class="form-label">Description</label>
+                            {% render_field form.description placeholder="Description of goal" id="description" name="description" type="text" autocomplete="description" required=True class="form-input" %}
+                            {{ form.description.errors | safe }}
+                            
+                            <label for="clue" class="form-label">Clue</label>
+                            {% render_field form.clue placeholder="Clue text" id="clue" name="clue" type="text" autocomplete="clue" required=True class="form-input" %}
+                            {{ form.clue.errors | safe }}
+
+                            <label for="answer" class="form-label">Answer</label>
+                            {% render_field form.answer placeholder="Answer text" id="answer" name="answer" type="text" autocomplete="answer" required=True class="form-input" %}
+                            {{ form.answer.errors | safe }}
+
+                            <label for="lat" class="form-label">Latitude</label>
+                            {% render_field form.lat placeholder="Latitude" id="lat" name="lat" type="number" autocomplete="lat" required=True class="form-input uneditable-ui" %}
+                            {{ form.lat.errors | safe }}
+
+                            <label for="long" class="form-label">Longitude</label>
+                            {% render_field form.long placeholder="Longitude" id="long" name="long" type="number" autocomplete="long" required=True class="form-input uneditable-ui" %}
+                            {{ form.long.errors | safe }}
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <div id = "empty-form" class="hidden">
+                        <hr>
+                        <label for="location-title-x" class="form-label">Title</label>
+                        {% render_field location_formset.empty_form.title placeholder="Title" id="location-title-x" name="location-title" type="text" autocomplete="title" required=True class="form-input" %}
+                        {{ location_formset.empty_form.title.errors | safe }}
+                        
+                        <label for="description-x" class="form-label">Description</label>
+                        {% render_field location_formset.empty_form.description placeholder="Description of goal" id="description-x" name="description" type="text" autocomplete="description" required=True class="form-input" %}
+                        {{ location_formset.empty_form.description.errors | safe }}
+
+                        <label for="clue-x" class="form-label">Clue</label>
+                        {% render_field location_formset.empty_form.clue placeholder="Clue text" id="clue-x" name="clue" type="text" autocomplete="clue" required=True class="form-input" %}
+                        {{ location_formset.empty_form.clue.errors | safe }}
+
+                        <label for="answer-x" class="form-label">Answer</label>
+                        {% render_field location_formset.empty_form.answer placeholder="Answer text" id="answer-x" name="answer" type="text" autocomplete="answer" required=True class="form-input" %}
+                        {{ location_formset.empty_form.answer.errors | safe }}
+
+                        <label for="lat-x" class="form-label">Latitude</label>
+                        {% render_field location_formset.empty_form.lat placeholder="Latitude" id="lat-x" name="lat" type="number" autocomplete="lat" required=True class="form-input uneditable-ui" %}
+                        {{ location_formset.empty_form.lat.errors | safe }}
+
+                        <label for="long-x" class="form-label">Longitude</label>
+                        {% render_field location_formset.empty_form.long placeholder="Longitude" id="long-x" name="long" type="number" autocomplete="long" required=True class="form-input uneditable-ui" %}
+                        {{ location_formset.empty_form.long.errors | safe }}
+                    </div>
+                </form>
+                <!-- <button class="btn btn-2" id="add_more" type="button">Add Another Location</button> -->
+                <button class="btn btn-2" type="submit" onclick="submitForm(event)">Create Quest</button>
+                {% if user.is_superuser %}
+                    {% if '127.0.0.1' in request.build_absolute_uri %}
+                    <a href="http://127.0.0.1:8000/maps/approve">
+                        <button class="btn btn-2" type="button">See Pending User Submissions</button>
+                    </a>
+                    {% else %}
+                    <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/approve">
+                        <button class="btn btn-2 mt-2" type="button">See User Submissions</button>
+                    </a>
+                    {% endif %}
+                {% endif %}
+
+                <div id="toastNotice" class="toast" data-autohide="false" data-bs-delay="3000">
+                    <div class="toast-header">
+                        <strong class="mr-auto">GeoQuest</strong>
+                    </div>
+                    <div class="toast-body">
+                        Form Submitted. Performing validation...
+                    </div>                    
+                </div>
+                   
+            </div>
+
+
+            <div class="d-flex" id="map"></div>
+            {% else %}
+            <div id="myModal" class="modal fade">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sign in</h5>
+                            {% if '127.0.0.1' in request.build_absolute_uri %}
+                            <a href="http://127.0.0.1:8000/login">
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </a>
+                            {% else %}
+                            <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/login">
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div class="modal-body">
+                            You must be logged in to create a quest.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <script>
+            // const addMoreBtn = document.getElementById("add_more")
+            const totalForms = document.getElementById("id_location_set-TOTAL_FORMS")
+
+            // addMoreBtn.addEventListener('click', add_new_form)
+
+            function add_new_form(event) {
+                // console.log("started adding new form");
+
+                // if(event) {                      //caused error so commented out
+                //     event.preventDefault()
+                // }
+                const currentLocations = document.getElementsByClassName("questForm")
+                const currentLocationCount = currentLocations.length
+                const formCopy = document.getElementById("all-location-forms")
+                const copyEmptyForm = document.getElementById("empty-form").cloneNode(true)
+                copyEmptyForm.setAttribute('class', 'questForm')
+                copyEmptyForm.setAttribute('id', `quest-${currentLocationCount}`)
+
+                // reset location list ids
+                copyEmptyForm.childNodes[3].setAttribute('for', `location-title-${currentLocationCount}`)
+                copyEmptyForm.childNodes[5].setAttribute('id', `location-title-${currentLocationCount}`)
+                copyEmptyForm.childNodes[7].setAttribute('for', `description-${currentLocationCount}`)
+                copyEmptyForm.childNodes[9].setAttribute('id', `description-${currentLocationCount}`)
+                copyEmptyForm.childNodes[11].setAttribute('for', `clue-${currentLocationCount}`)
+                copyEmptyForm.childNodes[13].setAttribute('id', `clue-${currentLocationCount}`)
+                copyEmptyForm.childNodes[15].setAttribute('for', `answer-${currentLocationCount}`)
+                copyEmptyForm.childNodes[17].setAttribute('id', `answer-${currentLocationCount}`)
+                copyEmptyForm.childNodes[19].setAttribute('for', `lat-${currentLocationCount}`)
+                copyEmptyForm.childNodes[21].setAttribute('id', `lat-${currentLocationCount}`)
+                copyEmptyForm.childNodes[23].setAttribute('for', `long-${currentLocationCount}`)
+                copyEmptyForm.childNodes[25].setAttribute('id', `long-${currentLocationCount}`)
+
+                const regex = new RegExp("__prefix__", 'g')
+                copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentLocationCount)
+                totalForms.setAttribute("value", currentLocationCount + 1)
+                formCopy.append(copyEmptyForm)
+            }
+
+             
+            
+            function submitForm(event) {
+                var myForm = document.getElementById("form-container");
+                event.preventDefault();
+                // console.log("Submitting form");
+                showToast();
+                setTimeout(function() {
+                    myForm.submit();
+                    //your code to be executed after 1 second
+                }, 3000);
+                
+                
+            }
+
+            function showToast(){
+                var alert = document.getElementById("toastNotice");
+                var bsAlert = new bootstrap.Toast(alert);
+                bsAlert.show();
+
+            }
+        </script>
+
+        <script>
+            function initMap() {
+                let UVA = {lat: 38.03417823939488, lng: -78.50802011454928};
+                let map = new google.maps.Map(
+                    document.getElementById("map"), {
+                        zoom: 14, 
+                        center: UVA,
+                        mapId: 'a18317417041ba25',
+                    });
+                
+                on_first_form = true;
+
+                map.addListener("click", (e) => {                               //On map click these functions are triggered
+                    placeMarkerAndPanTo(e.latLng, map);
+                    
+                    const currentLocations = document.getElementsByClassName("questForm")
+                    const currentLocationCount = currentLocations.length
+                    
+                    if(on_first_form == true){
+                        on_first_form = false;
+                    }else{
+                        add_new_form(e);
+                    }
+            
+                    updateFormFields(e.latLng);
+                });
+            }
+
+            const markers = [];
+            function placeMarkerAndPanTo(latLng, map) {
+                const marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                });
+                markers.push(marker);
+
+                map.panTo(latLng);
+
+                marker.addListener("click", function () {
+                    const index = markers.indexOf(marker);
+                    markers.splice(index, 1);
+
+                    marker.setMap(null);    //Remove marker
+
+                    const formCopy = document.getElementById("all-location-forms")
+                    formCopy.removeChild(formCopy.children[index]);
+
+                    const currentLocations = document.getElementsByClassName("questForm")
+                    const currentLocationCount = currentLocations.length
+                    const totalForms = document.getElementById("id_location_set-TOTAL_FORMS")
+                    totalForms.setAttribute("value", currentLocationCount)
+                    
+                    for (let i = 0; i < currentLocationCount; i++) {
+                        currentLocations[i].id = `quest-${i}`;
+                        currentLocations[i].childNodes[3].setAttribute('for', `location-title-${i}`)
+                        currentLocations[i].childNodes[5].setAttribute('id', `location-title-${i}`)
+                        currentLocations[i].childNodes[5].setAttribute('name', `location_set-${i}-title`)
+                        currentLocations[i].childNodes[7].setAttribute('for', `description-${i}`)
+                        currentLocations[i].childNodes[9].setAttribute('id', `description-${i}`)
+                        currentLocations[i].childNodes[9].setAttribute('name', `location_set-${i}-description`)
+                        currentLocations[i].childNodes[11].setAttribute('for', `clue-${i}`)
+                        currentLocations[i].childNodes[13].setAttribute('id', `clue-${i}`)
+                        currentLocations[i].childNodes[13].setAttribute('name', `location_set-${i}-clue`)
+                        currentLocations[i].childNodes[15].setAttribute('for', `answer-${i}`)
+                        currentLocations[i].childNodes[17].setAttribute('id', `answer-${i}`)
+                        currentLocations[i].childNodes[17].setAttribute('name', `location_set-${i}-answer`)
+                        currentLocations[i].childNodes[19].setAttribute('for', `lat-${i}`)
+                        currentLocations[i].childNodes[21].setAttribute('id', `lat-${i}`)
+                        currentLocations[i].childNodes[21].setAttribute('name', `location_set-${i}-lat`)
+                        currentLocations[i].childNodes[23].setAttribute('for', `long-${i}`)
+                        currentLocations[i].childNodes[25].setAttribute('id', `long-${i}`)
+                        currentLocations[i].childNodes[25].setAttribute('name', `location_set-${i}-long`)
+                    }
+                });
+            }
+
+            function updateFormFields(latLng) {
+                const currentLocations = document.getElementsByClassName("questForm")
+                const currentLocationCount = currentLocations.length
+
+                const latInputName = `location_set-${currentLocationCount - 1}-lat`;
+                const longInputName = `location_set-${currentLocationCount - 1}-long`;
+
+                const latInput = document.querySelector(`[name="${latInputName}"]`);
+                const longInput = document.querySelector(`[name="${longInputName}"]`);
+                
+                if (latInput) {
+                    latInput.value = latLng.lat().toFixed(14);
+                    longInput.value = latLng.lng().toFixed(14);
+                }
+
+                // console.log("completed updating forms");
+            }
+        </script>
+
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBr3XuQM53-ZNvXojCys7OwjHExy8jlUvI&callback=initMap"></script>
+        
+        <script>
+            var myForm = document.getElementById("modal");
+            $('.toggleModal').on('click', function (e) {
+  
+                $('.modal-info').toggleClass('active');
+  
+            });
+        </script>
+        
+
+        {% include "footer.html" %}
+    </body>
+</html>

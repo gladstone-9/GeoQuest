@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load widget_tweaks %}
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest | Approve</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+        <link rel="stylesheet" href="{% static 'maps/approve/style.css' %}">
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        <div class="container py-5" style="width: 50vw;">
+            <div class="approve-content">
+                {% block content %}
+                <h2>Pending User Quest Submissions</h2>
+                {% if latest_quest_list %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Queue #</th>
+                            <th scope="col">Quest Title</th>
+                            <th scope="col">Author</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        {% for quest in latest_quest_list %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <th><a href="{% url 'maps:details' quest.id %}">{{ quest.title }}</a></th>
+                                <th>{{ quest.author.name }}</th>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="d-flex justify-content-center">No submissions are available at this time.</p>
+                {% endif %}
+                {% endblock %}
+            </div>
+        </div>
+
+        {% include "footer.html" %}
+    </body>
+</html>

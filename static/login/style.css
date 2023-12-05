@@ -1,0 +1,57 @@
+.login-content {
+    background: #fff;
+    border-radius: 0.6rem;
+    padding: 10vh 7vw;
+}
+
+.login-or {
+    margin-bottom: 1.25rem;
+}
+
+.form-input {
+    width: 100%;
+    border: 0.06rem solid #ebebeb;
+    border-radius: 0.3rem;
+    padding: 1rem 1.25rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 1rem;
+}
+
+.form-submit {
+    width: 100%;
+    border-radius: 0.3rem;
+    padding: 1rem 1.25rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    background-color: #051937;
+}
+
+.form-submit:hover {
+    color: #00bf72;
+}
+
+h2 {
+    line-height: 1.66;
+    margin: 0;
+    padding: 0;
+    font-weight: 700;
+    color: #222;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.forgotPass {
+    font-weight: 500;
+    text-align: center;
+    margin-top: 5rem;
+    margin-bottom: 0.3rem;
+}

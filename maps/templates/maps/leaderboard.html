@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest | Leaderboard</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+        <link rel="stylesheet" href="{% static 'maps/leaderboard/style.css' %}">
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        
+        <div class="container py-5" style="width: 50vw;">
+            <div class="table-content">
+                <h2>Leaderboards</h2>
+                <div class="d-flex align-items-center justify-content-evenly">
+                    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                      <button class="nav-link active" id="v-pills-complete-tab" data-bs-toggle="pill" data-bs-target="#v-pills-complete" 
+                        type="button" role="tab" aria-controls="v-pills-complete" aria-selected="true">Quests Completed</button>
+                      <button class="nav-link" id="v-pills-create-tab" data-bs-toggle="pill" data-bs-target="#v-pills-create" 
+                        type="button" role="tab" aria-controls="v-pills-create" aria-selected="false">Quests Created</button>
+                      <button class="nav-link" id="v-pills-popular-tab" data-bs-toggle="pill" data-bs-target="#v-pills-popular" 
+                        type="button" role="tab" aria-controls="v-pills-popular" aria-selected="false">Popular Quests</button>
+                        <button class="nav-link" id="v-pills-difficult-tab" data-bs-toggle="pill" data-bs-target="#v-pills-difficult" 
+                        type="button" role="tab" aria-controls="v-pills-difficult" aria-selected="false">Difficult Quests</button>
+                    </div>
+                    <div class="tab-content" id="v-pills-tabContent">
+                      <div class="tab-pane fade show active" id="v-pills-complete" role="tabpanel" aria-labelledby="v-pills-complete-tab">
+                        {% if players %}
+                          <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Quests Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">  
+                                {% for player in players %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <th>{{ player.name }}</th>
+                                    <th>{{ player.total_quests_completed }}</th>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                          </table>
+                        {% else %}
+                        <p class="d-flex justify-content-center">No quests have been completed yet.</p>
+                        {% endif %}
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-create" role="tabpanel" aria-labelledby="v-pills-create-tab">
+                        {% if author_quests_created %}
+                          <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Quests Created</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                {% for author in author_quests_created %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <th>{{ author.name }}</th>
+                                    <th>{{ author.quests_created }}</th>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                          </table>
+                        {% else %}
+                        <p class="d-flex justify-content-center">No quests have been created yet.</p>
+                        {% endif %}
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-popular" role="tabpanel" aria-labelledby="v-pills-popular-tab">
+                        {% if popular_quests %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Quest Name</th>
+                                        <th scope="col">Author</th>
+                                        <th scope="col"># of Likes</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for quest in popular_quests %}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <th>{{ quest.title }}</th>
+                                        <th>{{ quest.author.name }}</th>
+                                        <th>{{ quest.likes }}</th>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                        <p class="d-flex justify-content-center">No quests have been created yet.</p>
+                        {% endif %}
+                      </div>
+                      <div class="tab-pane fade" id="v-pills-difficult" role="tabpanel" aria-labelledby="v-pills-difficult-tab">
+                        {% if difficult_quests %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Quest Name</th>
+                                        <th scope="col">Author</th>
+                                        <th scope="col">Difficulty</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for quest in difficult_quests %}
+                                    <tr>
+                                        <th scope="row">{{ forloop.counter }}</th>
+                                        <th>{{ quest.title }}</th>
+                                        <th>{{ quest.author.name }}</th>
+                                        <th>{{ quest.difficulty }}</th>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                        <p class="d-flex justify-content-center">No quests have been created yet.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+        
+
+        {% include "footer.html" %}
+    </body>
+</html>

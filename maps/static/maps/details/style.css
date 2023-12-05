@@ -1,0 +1,82 @@
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.btn-2 {
+    border-radius: 0.3rem;
+    padding: 0.5rem 1.25rem;
+    margin-bottom: 2rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    background-color: #051937;
+}
+
+.btn-2:hover {
+    color: #00bf72;
+}
+
+.list-group-outer {
+    list-style-type: none;
+}
+
+.list-group-number {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #222;
+}
+
+.list-group-inner {
+
+}
+
+.list-group-item {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #222;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 700;
+    color: #222;
+    font-size: 1.9rem;
+}
+
+h2 {
+    line-height: 1.66;
+    margin: 0;
+    padding: 0;
+    font-weight: 700;
+    color: #222;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.approve-content {
+    background: #fff;
+    border-radius: 0.6rem;
+    padding: 10vh 7vw;
+}
+
+.form-input {
+    width: 100%;
+    border: 0.06rem solid #ebebeb;
+    border-radius: 0.3rem;
+    padding: 1rem 1.25rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 1rem;
+}
+

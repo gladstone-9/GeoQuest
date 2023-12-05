@@ -1,0 +1,203 @@
+{% extends MACHINA_BASE_TEMPLATE_NAME %}
+{% load static %}
+{% load i18n %}
+{% load forum_permission_tags %}
+
+{% block title %}GeoQuest Forum | {% block sub_title %}{% endblock sub_title %}{% endblock title %}
+
+{% block css %}
+<link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+    href="https://i.imgur.com/n1H99dr.png">
+<meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+    content="https://i.imgur.com/n1H99dr.png">
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/machina.board_theme.vendor.min.css' %}" />
+<link rel="stylesheet" href="{% static 'css/machina.board_theme.min.css' %}" />
+<link rel="stylesheet" href="{% static 'fontawesomefree/css/all.min.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'base/style.css' %}" type="text/css">
+{% endblock css %}
+
+
+{% block body %}
+<style>
+    html, body { height: 100%;}
+
+    body > footer {
+    position: sticky;
+    top: 100vh;
+    }
+
+    .fa-brands {
+        color: white;
+    }
+</style>
+{% block header %}
+
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: #212529;">
+    {% if '127.0.0.1' in request.build_absolute_uri %}
+    <a class="navbar-brand" href="http://127.0.0.1:8000/">GeoQuest</a>
+    {% else %}  
+        <a class="navbar-brand" href="https://geoquest-b-12-5253c5014417.herokuapp.com/">GeoQuest</a>
+    {% endif %}
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse ml-auto" id="navbarSupportedContent">
+    {% block header_collapse %}
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if '127.0.0.1' in request.build_absolute_uri %}
+        <!--
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="http://127.0.0.1:8000/">Home</a>
+        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="http://127.0.0.1:8000/about">About</a>
+        </li>
+        {% else %}
+        <!--
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="https://geoquest-b-12-5253c5014417.herokuapp.com/">Home</a>
+        </li>-->
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="https://geoquest-b-12-5253c5014417.herokuapp.com/about">About</a>
+        </li>
+        {% endif %}
+        {% if user.is_staff %}
+        <li class="nav-item">
+            <a class="nav-link" href="/admin">Admin</a>
+        </li>
+        {% endif %}
+        {% if '127.0.0.1' in request.build_absolute_uri %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://127.0.0.1:8000/maps" id="navbarDropdownMenuLink" data-toggle="dropdown" role="button" aria-expanded="false">
+              Quests
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="http://127.0.0.1:8000/maps/">Explore</a>
+              <hr class="dropdown-divider">
+              <a class="dropdown-item" href="http://127.0.0.1:8000/maps/search">Search</a>
+              <a class="dropdown-item" href="http://127.0.0.1:8000/maps/create">Create</a>
+              <a class="dropdown-item" href="http://127.0.0.1:8000/maps/leaderboard">Leaderboard</a>
+              {% if user.is_staff %}
+                <a class="dropdown-item" href="http://127.0.0.1:8000/maps/approve">Approve Quests</a>
+              {% endif %}
+            </div>
+        </li>
+        {% else %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps" id="navbarDropdownMenuLink" data-toggle="dropdown" role="button" aria-expanded="false">
+              Quests
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/">Explore</a>
+              <hr class="dropdown-divider">
+              <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/search">Search</a>
+              <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/create">Create</a>
+              <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/leaderboard">Leaderboard</a>
+              {% if user.is_staff %}
+                <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/approve">Approve Quests</a>
+              {% endif %}
+            </div>
+        {% endif %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" role="button" aria-expanded="false">
+              Account
+            </a>
+            {% if user.is_authenticated %}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                {% if '127.0.0.1' in request.build_absolute_uri %}
+                <a class="dropdown-item" href="http://127.0.0.1:8000/maps/myQuests">My Quests</a>
+                {% else %}
+                <a class="dropdown-item" href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/myQuests">My Quests</a>
+                {% endif %}
+                <hr class="dropdown-divider">
+                <a class="dropdown-item" href="{% url 'account_email' %}">Change Email</a>
+                <a class="dropdown-item" href="{% url 'account_logout' %}">Sign Out</a>
+            </div>
+            {% else %}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="{% url 'account_login' %}">Login</a>
+                <a class="dropdown-item" href="{% url 'account_signup' %}">Sign Up</a>
+            </div>
+            {% endif %}
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/forum">Forum</a>
+      </li>
+    </ul>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-item nav-link" href="{% url 'forum_search:search' %}">{% trans "Advanced search" %}</a>
+    </div>
+    {% endblock header_collapse %}
+  </div>
+  <form class="form-inline my-2 ml-auto my-lg-0" role="search" action="{% url 'forum_search:search' %}">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q">
+    <button class="btn btn-outline-light my-2 my-sm-0" type="submit">{% trans "Search" %}</button>
+  </form>
+</nav>
+{% endblock header %}
+
+<div class="my-5 container" id="main_container">
+<div class="content">
+  <div class="row">
+    <div class="col-12">
+      {% block breadcrumb %}{% include "partials/breadcrumb.html" %}{% endblock breadcrumb %}
+      <div class="float-right controls-link-wrapper">
+      {% spaceless %}
+      {% if not request.user.is_anonymous %}
+        <a href="{% url 'forum_member:user_subscriptions' %}" class="d-inline-block ml-3"><i class="fas fa-bookmark">&nbsp;</i>{% trans "Subscriptions" %}</a>
+        <a href="{% url 'forum_member:user_posts' request.user.id %}" class="d-inline-block ml-3"><i class="fas fa-comments">&nbsp;</i>{% trans "View my posts" %}</a>
+      {% endif %}
+      {% get_permission 'can_access_moderation_queue' request.user as can_access_moderation_queue %}
+      {% if can_access_moderation_queue %}
+        <a href="{% url 'forum_moderation:queue' %}" class="d-inline-block ml-3"><i class="fas fa-gavel">&nbsp;</i>{% trans "Moderation queue" %}</a>
+      {% endif %}
+      {% endspaceless %}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <br />
+      {% block messages %}{% include "partials/messages.html" %}{% endblock messages %}
+    </div>
+  </div>
+  
+    {% block content %}
+    {% endblock content %}
+  </div>
+  
+</div>
+<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 px-3" style="background: #212529;">
+    <div class="col-md-4 d-flex align-items-center">
+        <span class="mb-3 pl-2 mb-md-0 text-white">© 2023 GeoQuest, LLC</span>
+    </div>
+    <div class="col-md-2 d-flex align-items-center justify-content-around pr-2">
+        <a href="https://www.facebook.com/"><i class="fa-brands fa-facebook fa-lg"></i></a>
+        <a href="https://www.instagram.com/"><i class="fa-brands fa-instagram fa-lg"></i></a>
+        <a href="https://twitter.com/?lang=en"><i class="fa-brands fa-x-twitter fa-lg"></i></a>
+        <a href="https://www.tiktok.com/en/"><i class="fa-brands fa-tiktok fa-lg"></i></a>
+    </div>
+    <div class="col-md-4 d-flex align-items-center justify-content-end pr-2 w-50">
+        <span class="mb-3 mb-md-0 text-white">
+            Gabe Silverstein |
+            Janice Guo |
+            Gabriel Gladstone |
+            Brian Xiao |
+            Shruthi Kalathur
+        </span>
+    </div>
+</footer>
+{% endblock body %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'js/machina.packages.min.js' %}" type="text/javascript" charset="utf-8"></script>
+<script src="{% static 'js/machina.min.js' %}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  $(function() {
+    machina.init();
+    {% block onbodyload %}{% endblock onbodyload %}
+  });
+</script>
+{% endblock js %}

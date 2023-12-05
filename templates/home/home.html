@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#myModal").modal('show');
+            });
+        </script>
+
+        <link rel="stylesheet" href="{% static 'home/style.css' %}">
+    </head>
+
+    <body>
+        {% include "navbar.html" %}
+
+        {% if messages %}
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Messages</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                        {% for message in messages %}
+                        <li>{{message}}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="title-card">
+            <img src="https://i.imgur.com/hkzTZkm.jpg" style="width:100vw;height:100vh;">
+            <div class="center">
+                <h2>Welcome to GeoQuest!</h2>
+
+                {% if user.is_authenticated %}
+                    {% if user.first_name == '' %}
+                    <p style="font-size: 1.5rem;">Hello {{ user.username }}, glad to have you.</p>
+                    {% else %}
+                    <p style="font-size: 1.5rem;">Hello {{ user.first_name }}, glad to have you.</p>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                    <p style="font-size: 1rem;">This is an admin account.</p>
+                    {% endif %}
+                {% else %}
+                    <a class="btn btn-dark d-inline-flex align-items-center" href="{% provider_login_url 'google'%}">
+                        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" />
+                        &nbsp; Login with Google
+                    </a>
+                {% endif %}
+            </div>
+            <a href="#main-body">
+                <div class="down-arrow"></div>
+            </a>
+        </div>
+        <div class="gap"></div>
+        <div class="container" id="main-body">
+            <div class="sticky-arrow">
+                <a href="#header-top">
+                    <div id="first" class="up-arrow"></div>
+                    <div id="second" class="up-arrow"></div>
+                </a>
+            </div>
+            <div class="body-content">
+                <a href="#bottom-section">
+                    <div class="left-card">
+                        <div class="center-horizontal">
+                            <img src="https://i.imgur.com/N81H1IZ.jpg" style="width:10vw;height:10vw;">
+                            <div class="card-text">WHAT IS A QUEST?</div>
+                        </div>
+
+                    </div>
+                </a>
+                {% if '127.0.0.1' in request.build_absolute_uri %}
+                <a href="http://127.0.0.1:8000/maps/">
+                    <div class="middle-card">
+                        <div class="center-horizontal">
+                            <img src="https://i.imgur.com/mGA1o11.jpg" style="width:10vw;height:10vw;">
+                            <div class="card-text">PLAY/MAKE QUESTS</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="http://127.0.0.1:8000/forum/">
+                    <div class="right-card">
+                        <div class="center-horizontal">
+                            <img src="https://i.imgur.com/wCmp6xR.jpg" style="width:10vw;height:10vw;">
+                            <div class="card-text">CHAT WITH OTHERS</div>
+                        </div>
+                    </div>
+                </a>
+                {% else %}
+                <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/">
+                    <div class="middle-card">
+                        <div class="center-horizontal">
+                            <img src="https://i.imgur.com/mGA1o11.jpg" style="width:10vw;height:10vw;">
+                            <div class="card-text">PLAY/MAKE QUESTS</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/forum/">
+                    <div class="right-card">
+                        <div class="center-horizontal">
+                            <img src="https://i.imgur.com/wCmp6xR.jpg" style="width:10vw;height:10vw;">
+                            <div class="card-text">CHAT WITH OTHERS</div>
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                <a href="#bottom-section">
+                    <div class="down-arrow-modified"></div>
+                </a>
+            </div>
+            <div id="bottom-section" class="bottom-container">
+                <div class="title-text">Quest FAQ</div>
+                <br>
+                <div class="subtitle-text mt-4 uline">What is Geocaching?</div>
+                <br>
+                <div class="body-text">The basic concept behind geocaching starts with individuals hiding containers with small prizes (geocaches) in various locations.
+                    They then share the coordinates of the cache(s) online to other people. Other geocachers will use the coordinates and other clues they decipher to find the cache. 
+                    The goal is to explore and find as many caches as possible.
+                </div>
+                <br>
+                <div class="subtitle-text uline">What is GeoQuest? / What are Quests?</div>
+                <br>
+                <div class="body-text">GeoQuest is a geocaching-inspired app for UVA. GeoQuest aims to bring this unique outdoor experience to UVA by providing our own spin on geocaching. Quests are a take on geocaches that incorporate the
+                    puzzle elements of scavenger hunts. Quests can have multiple locations where after you locate the first step, a clue for the next is revealed. Quests can still be just
+                    a single location, following the original geocache spirit.
+                </div>
+                <br>
+                {% if '127.0.0.1' in request.build_absolute_uri %}
+                <a href="http://127.0.0.1:8000/maps/">
+                    <div class="link-text">Explore for yourself</div>
+                </a>
+                {% else %}
+                <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/maps/">
+                    <div class="link-text">Explore for yourself</div>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% include "footer.html" %}
+
+    <script>
+        function setArrow () {
+            const secondBlock = document.getElementById("bottom-section")
+            const arrow = document.getElementById("first")
+            const dim = 50
+            var viewportHeight = window.innerHeight
+            var sbDistanceToTop = window.pageYOffset + secondBlock.getBoundingClientRect().top + 25
+
+            const scrollDist = window.pageYOffset
+            let blockPoint = scrollDist - sbDistanceToTop + 100
+            if (blockPoint < 35 && blockPoint > 0) {
+                let fillAmount = 50-blockPoint
+                arrow.style = "height: " + fillAmount + "px; width: " + fillAmount + "px; opacity: 1;"
+            } else if (blockPoint >= 35) {
+                arrow.style = "opacity: 0;"
+            } else {
+                arrow.style = "height: " + 50 + "px; width: " + 50 + "px;"
+            }
+            window.requestAnimationFrame(setArrow)
+        }
+        window.requestAnimationFrame(setArrow)
+    </script>
+    <script>
+        function updateNarrowScreen () {
+            const upArrow = document.getElementsByClassName("sticky-arrow")
+            const leftCard = document.getElementsByClassName("left-card")
+            const middleCard = document.getElementsByClassName("middle-card")
+            const rightCard = document.getElementsByClassName("right-card")
+
+            if (window.innerHeight > window.innerWidth){
+                upArrow[0].style = "display: none;"
+                leftCard[0].style = "width: 80vw; top: 15vh; height: 20vh"
+                middleCard[0].style = "width: 80vw; top: 40vh; left: 10vw; height: 20vh"
+                rightCard[0].style = "width: 80vw; top: 65vh; left: 10vw; height: 20vh"
+            } else {
+                upArrow[0].style = ""
+                leftCard[0].style = ""
+                middleCard[0].style = ""
+                rightCard[0].style = ""
+            }
+            window.requestAnimationFrame(updateNarrowScreen)
+        }
+        window.requestAnimationFrame(updateNarrowScreen)
+    </script>
+    </body>
+
+</html>
+
+

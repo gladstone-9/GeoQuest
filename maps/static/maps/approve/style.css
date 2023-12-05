@@ -1,0 +1,33 @@
+.approve-content {
+    background: #fff;
+    border-radius: 0.6rem;
+    padding: 10vh 4vw;
+}
+
+.btn-2 {
+    border-radius: 0.3rem;
+    padding: 0.5rem 1.25rem;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+    background-color: #051937;
+}
+
+.btn-2:hover {
+    color: #00bf72;
+}
+
+h2 {
+    line-height: 1.66;
+    margin: 0;
+    padding: 0;
+    font-weight: 700;
+    color: #222;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}

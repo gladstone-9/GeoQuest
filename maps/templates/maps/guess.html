@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load widget_tweaks %}
+    {% load static %}
+    {% load socialaccount %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    <title>GeoQuest | Guess</title>
+
+    <meta charset="utf-8">
+    <meta data-n-head="ssr" data-hid="description" name="description" content="A Google Maps scavenger hunt at UVA">
+    <link data-n-head="ssr" rel="icon" type="image/png" sizes="any" href="https://i.imgur.com/n1H99dr.png">
+    <meta data-n-head="ssr" data-hid="image" name="image" property="og:image" content="https://i.imgur.com/n1H99dr.png">
+
+    <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+    <link rel="stylesheet" href="{% static 'maps/guess/style.css' %}">
+</head>
+
+<body>
+    {% include "navbar.html" %}
+    <div class="container py-5">
+        {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
+       
+        <div class="guess-content">
+            <h2>Quest Progress</h2>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <h3 class="pt-4">Location Title: {{ curr_location.title }}</h3>
+            <h3>Description: {{ curr_location.description }}</h3>
+            <style>
+                #clueHeader {
+                  display: none;
+                }
+            </style>
+            <h3 class="pb-3" id="clueHeader">Clue: {{ curr_location.clue }}</h3>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" style="cursor: pointer;" role="switch" id="flexSwitchCheckDefault" onchange="toggleClue()">
+                <label class="form-check-label mb-3" for="flexSwitchCheckDefault">Show Clue</label>
+            </div>  
+            <form method="post" id="guess-form">
+                {% csrf_token %}
+                <label for="answer" class="form-label">Answer</label>
+                {% render_field form.answer placeholder="Answer" id="answer" name="answer" type="text" autocomplete="answer" required=True class="form-input" %}
+            </form>
+            <div>
+                <button class="btn btn-2" type="submit" onclick="submitGuess(event)">Submit Guess</button>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="mt-3" id="map2"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleClue() {
+            var clueHeader = document.getElementById("clueHeader");
+            var checkbox = document.getElementById("flexSwitchCheckDefault");
+
+            if (checkbox.checked) {
+                clueHeader.style.display = "block";
+            } else {
+                clueHeader.style.display = "none";
+            }
+        }
+
+        function submitGuess(event) {
+            var myForm = document.getElementById("guess-form");
+            event.preventDefault();
+            myForm.submit();
+        }
+    </script>
+
+    <script>
+        var locations = JSON.parse('{{ locations_json|safe }}');
+        var curr_locnum = JSON.parse('{{ curr_locnum_json|safe }}').locnum;
+
+        function initMap() {
+            let UVA = { lat: 38.03417823939488, lng: -78.50802011454928 };
+            let map = new google.maps.Map(
+                document.getElementById('map2'), {
+                zoom: 14,
+                center: UVA,
+                mapId: 'a18317417041ba25', // DEMO_MAP_ID for testing
+            }
+            );
+
+            locations.forEach(loc => {
+                placeMarkerAndPanTo(loc, map);
+            });
+        }
+
+        var curr_location = 1;  // Used to compare with locnum to display current special marker at current location.
+
+        async function placeMarkerAndPanTo(loc, map) {
+            // Request libraries
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            const { PinElement } = await google.maps.importLibrary("marker");
+
+            var latLng = new google.maps.LatLng(loc.lat, loc.long);
+            // console.log(loc.pk);
+            if(curr_location > curr_locnum){
+                new google.maps.Circle({
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: "#FF0000",
+                    fillOpacity: 0.35,
+                    map,
+                    center: latLng,
+                    radius: 100,
+                });
+            }else if(curr_location == curr_locnum){
+                // Special marker to denote current location
+
+                //Image Marker
+                const imgMarker = document.createElement("img");
+                        
+                //Chosen and resized image
+                imgMarker.src = "https://cdn3.iconfinder.com/data/icons/outdoor-and-camping-icons/512/Hiking-1024.png";
+                imgMarker.style.width = "3rem";
+                imgMarker.style.height = "3rem";
+
+                const advanced_marker = new AdvancedMarkerElement({
+                    map,
+                    position: latLng,
+                    // content: marker_style.element,   //For Customized Marker
+                    content: imgMarker,     //For Image Marker
+                });
+
+                map.panTo(latLng);
+            }else{
+                new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                });
+            }
+
+            curr_location++;
+        }
+
+
+        // Update Progress Bar on Each Reload
+        // Completed Bar
+        /*
+        var progressBarCompleted = document.querySelector(".progress-bar.bg-warning");
+        var newValueCompleted = parseInt((100 / locations.length));
+        progressBarCompleted.setAttribute("style", "width: " + newValueCompleted + "%");
+        progressBarCompleted.setAttribute("aria-valuenow", newValueCompleted);*/
+        // Current Bar
+        var newValueCurrent = parseInt((100 / locations.length) * (curr_locnum - 1));
+        var progressBarCurrent;
+        if (newValueCurrent >= 75) progressBarCurrent = document.querySelector(".progress-bar.bg-success");
+        else if (newValueCurrent >= 50) progressBarCurrent = document.querySelector(".progress-bar.bg-warning");
+        else progressBarCurrent = document.querySelector(".progress-bar.bg-danger");
+        progressBarCurrent.setAttribute("style", "width: " + newValueCurrent + "%");
+        progressBarCurrent.setAttribute("aria-valuenow", newValueCurrent);
+
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBr3XuQM53-ZNvXojCys7OwjHExy8jlUvI&callback=initMap"></script>
+
+
+    {% include "footer.html" %}
+</body>
+
+</html>

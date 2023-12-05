@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    {% load socialaccount %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    <title>GeoQuest | Search</title>
+
+    <meta charset="utf-8">
+    <meta data-n-head="ssr" data-hid="description" name="description" content="A Google Maps scavenger hunt at UVA">
+    <link data-n-head="ssr" rel="icon" type="image/png" sizes="any" href="https://i.imgur.com/n1H99dr.png">
+    <meta data-n-head="ssr" data-hid="image" name="image" property="og:image" content="https://i.imgur.com/n1H99dr.png">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script async="false" defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBr3XuQM53-ZNvXojCys7OwjHExy8jlUvI&libraries=marker,maps&callback=initMap"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#myModal").modal('show');
+        });
+    </script>
+
+    <link rel="stylesheet" href="{% static 'maps/style.css' %}">
+    <link rel="stylesheet" href="{% static 'maps/search/style.css' %}">
+</head>
+
+<body>
+    <div>{% include "navbar.html" %}</div>
+
+    {% if user.is_authenticated %}
+    <div class="container" id="filter-widgets-container" style="margin-left: 18%; width: 70%;">
+        <div class="row" id="filter-widgets-container">
+            <div class="col-1" style="width: fit-content;">
+                <div id="floating-panel" class="flex-child"
+                    style="width: fit-content; height: 2.5rem; margin-top: 0.625rem; border: none; box-shadow: rgba(0, 0, 0, 0.3) 0rem 0.06rem 0.25rem -0.06rem; border-radius: 0.125rem;">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" style="cursor:pointer;" type="checkbox" id="flexSwitchCheckDefault" checked>
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Quest Radius</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div class="dropdown flex-child">
+                    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="margin-top: 0.625rem; background-color: white; box-shadow: rgba(0, 0, 0, 0.3) 0rem 0.06rem 0.25rem -0.06rem;">
+                        Select Cache Type
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="#" onclick="showMarkersByType('All')">All Types</a></li>
+                        {% for cache_type, cache_type_label in CACHE_TYPE_CHOICES %}
+                        <li><a class="dropdown-item" href="#" onclick="showMarkersByType('{{ cache_type }}')">{{cache_type_label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-1 mt-2">
+                <button class="btn toggleModal"><i class="fa fa-info-circle" style="font-size: 24px"></i></button>
+                <div class="modal2"> 
+                    <header>
+                        <h2>How to Play</h2>
+                        <button class="close toggleModal">x</button>
+                    </header>
+                  
+                    <section>
+                        <p>Click on one of the map markers to open a pane that displays the difficulty and number of likes for that quest. If that quest seems appealing, just click the play button to begin! 
+                            You can also sort the quests by cache type using the dropdown or turn off location radius to make viewing the map easier. <br> Note: If markers aren't showing on the map, try refreshing the page.
+                        </p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Offcanvas with body scrolling</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="description-display"></div>
+            <div class="button-display"></div>
+            <div class="likes-display"></div>
+            <div class="difficulty-display"></div>
+        </div>
+    </div>
+
+    <div class="d-flex" style="position: relative; z-index: 1;" id="search_map"></div>
+    {% else %}
+    <div id="myModal" class="modal fade" >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sign in</h5>
+                    {% if '127.0.0.1' in request.build_absolute_uri %}
+                    <a href="http://127.0.0.1:8000/login">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </a>
+                    {% else %}
+                    <a href="https://geoquest-b-12-5253c5014417.herokuapp.com/login">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="modal-body">
+                    You must be logged in to search the quest catalog.
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        var questList = JSON.parse('{{ quests_data_json|safe }}');
+
+        let map;
+        let polygonList = [];
+        let avgMarkerList = [];
+
+        function initMap() {
+            // Request libraries
+            const { Map } = google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = google.maps.importLibrary("marker");
+            // const { PinElement } = await google.maps.importLibrary("marker");
+
+            let UVA = { lat: 38.03417823939488, lng: -78.50802011454928 };
+            map = new google.maps.Map(document.getElementById('search_map'), {
+                zoom: 14,
+                center: UVA,
+                mapId: 'a18317417041ba25', // DEMO_MAP_ID for testing
+            });
+
+            // Check and Act on Radius Switch Click
+            var switchCheckbox = document.getElementById("flexSwitchCheckDefault");
+            switchCheckbox.addEventListener("click", function () {
+                if (switchCheckbox.checked) {
+                    showRadius();
+                } else {
+                    hideRadius();
+                }
+            });
+
+            // Add marker at current location.
+            // Try HTML5 geolocation.
+            personMarker();
+
+            // Put all location markers.
+            // questList.forEach(quest => {
+            //     quest.locations.forEach(location => {
+            //         placeMarker(location, map);
+            //     });
+            // });
+
+            //Put average location marker.
+            questList.forEach(quest => {
+                var latitude_sum = 0;
+                var longitude_sum = 0;
+                quest.locations.forEach(location => {
+                    latitude_sum += location.lat;
+                    longitude_sum += location.long;
+                });
+                var avg_location = {
+                    lat: latitude_sum / quest.locations.length,
+                    long: longitude_sum / quest.locations.length
+                };
+
+                placeMarker(avg_location, map, quest.title, quest.author, quest.likes, quest.id, quest.cache_type, quest.difficulty);
+            });
+
+            //Put boundaries.
+            questList.forEach(quest => {
+                let locations_list = [];  // Use "let" to declare variables
+                quest.locations.forEach(location => {
+                    locations_list.push({ lat: location.lat, lng: location.long });
+                });
+
+                const polygon = new google.maps.Polygon({
+                    map: map,
+                    paths: locations_list,
+                    strokeColor: '#E05C6E',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#E05C6E',
+                    fillOpacity: 0.30,
+                    draggable: false,
+                    geodesic: false
+                });
+
+                polygonList.push(polygon);
+            });
+        }
+
+        async function personMarker(){
+            // Request libraries
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        let latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+                        //Customized Marker
+                        // const marker_style = new PinElement({
+                        //     glyphColor: "green",
+                        //     borderColor: "#137333",
+                        //     background: "#FBBC04",
+                        // });
+
+                        //Image Marker
+                        const imgMarker = document.createElement("img");
+
+                        //Chosen and resized image
+                        imgMarker.src = "https://cdn0.iconfinder.com/data/icons/user-icons-4/100/user-17-1024.png";
+                        imgMarker.style.width = "3rem";
+                        imgMarker.style.height = "3rem";
+
+                        const advanced_marker = new AdvancedMarkerElement({
+                            map,
+                            position: latLng,
+                            // content: marker_style.element,   //For Customized Marker
+                            content: imgMarker,     //For Image Marker
+                        });
+
+                        map.panTo(latLng);
+                    },
+                );
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        }
+
+        async function placeMarker(location, map, title, author, likes, id, cache_type, difficulty) {
+            // Request libraries
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            // const { PinElement } = await google.maps.importLibrary("marker");
+
+            var latLng = new google.maps.LatLng(location.lat, location.long);
+
+            //Image Marker
+            const advMarkerIMG = document.createElement("img");
+
+            //Chosen and resized image
+            if (cache_type == "Traditional") {
+                advMarkerIMG.src = "https://cdn-icons-png.flaticon.com/512/9922/9922093.png";
+            } else if (cache_type == "Event") {
+                advMarkerIMG.src = "https://cdn0.iconfinder.com/data/icons/party-icons-rounded/110/Party-Poppers-512.png";
+            } else if (cache_type == "Virtual") {
+                advMarkerIMG.src = "https://www.freeiconspng.com/uploads/apple-computer-laptop-mac-monitor-screen-icon--icon-search--16.png";
+            } else if (cache_type == "Locationless") {
+                advMarkerIMG.src = "https://utiskare.cz/soubory/loc_ikona.png";
+            }
+
+            advMarkerIMG.style.width = "2rem";
+            advMarkerIMG.style.height = "2rem";
+
+            const marker = new AdvancedMarkerElement({
+                position: latLng,
+                map: map,
+                title: title,
+                content: advMarkerIMG,
+            });
+
+            // Extra data for each marker
+            marker.data = {
+                author: author,
+                likes: likes,
+                id: id,
+                cache_type: cache_type,
+                difficulty: difficulty
+            };
+
+            avgMarkerList.push(marker)
+
+            marker.addListener('click', function () {
+                // Get a reference to the offcanvas and trigger the toggle
+                const offcanvas = new bootstrap.Offcanvas(document.getElementById("offcanvasScrolling"));
+                offcanvas.toggle();
+
+                // Edit the contents of the offcanvas
+                const offcanvasTitle = document.querySelector(".offcanvas-title");
+                offcanvasTitle.innerHTML = marker.title + " ~ " + marker.data.author.name;
+
+                // Clear and add Button with link
+                const buttonBody = document.querySelector(".button-display");
+                buttonBody.innerHTML = "";
+
+                const link = document.createElement("a");
+                link.href = `/maps/play/${marker.data.id}`;
+
+                const button = document.createElement("button");
+                button.setAttribute("type", "button");
+                button.classList.add("btn", "btn-2");
+                button.textContent = "Play";
+
+                link.appendChild(button);
+                buttonBody.appendChild(link);
+
+                // Clear and Add Likes
+                const likesBody = document.querySelector(".likes-display");
+                likesBody.innerHTML = "";
+
+                const display_likes = document.createElement("p");
+                display_likes.innerHTML = "&hearts; " + marker.data.likes + " likes";
+                likesBody.appendChild(display_likes);
+
+                const difficultyBody = document.querySelector(".difficulty-display");
+                difficultyBody.innerHTML = "";
+
+                const display_difficulty = document.createElement("p");
+                display_difficulty.innerHTML = "Difficulty: " + marker.data.difficulty;
+                difficultyBody.appendChild(display_difficulty);
+            });
+        }
+
+        // Used to hide or show the avg marker based on type.
+        function showMarkersByType(cacheType) {
+            if (cacheType == "All") {
+                setMapOnAll(map, avgMarkerList);
+            } else {
+                for (let i = 0; i < avgMarkerList.length; i++) {
+                    if (avgMarkerList[i].data.cache_type == cacheType) {
+                        avgMarkerList[i].setMap(map);
+                    } else {
+                        avgMarkerList[i].setMap(null);
+                    }
+                }
+            }
+
+        }
+
+        // Sets the map on all markers in the array.
+        //https://developers.google.com/maps/documentation/javascript/examples/marker-remove#maps_marker_remove-javascript
+        function setMapOnAll(map, list) {
+            for (let i = 0; i < list.length; i++) {
+                list[i].setMap(map);
+            }
+        }
+
+        // Removes the markers from the map, but keeps them in the array.
+        function hideRadius() {
+            setMapOnAll(null, polygonList);
+        }
+
+        // Shows any markers currently in the array.
+        function showRadius() {
+            setMapOnAll(map, polygonList);
+        }
+
+    </script>
+
+    <script>
+        var myForm = document.getElementById("modal");
+            $('.toggleModal').on('click', function (e) {
+      
+            $('.modal2').toggleClass('active');
+      
+        });
+    </script>
+
+    {% include "footer.html" %}
+</body>
+
+</html>

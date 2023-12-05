@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load widget_tweaks %}
+        {% load static %}
+        {% load socialaccount %}
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+
+        <title>GeoQuest | About</title>
+
+        <meta charset="utf-8">
+        <meta data-n-head="ssr" data-hid="description" name="description"
+            content="A Google Maps scavenger hunt at UVA">
+        <link data-n-head="ssr" rel="icon" type="image/png" sizes="any"
+            href="https://i.imgur.com/n1H99dr.png">
+        <meta data-n-head="ssr" data-hid="image" name="image" property="og:image"
+            content="https://i.imgur.com/n1H99dr.png">
+
+        <link rel="stylesheet" href="{% static 'about/style.css' %}">
+    </head>
+    <body>
+        {% include "navbar.html" %}
+        
+        <div class="container w-50 py-5">
+            <div class="table-content">
+                <h2>About Us</h2>
+                <ul class="nav nav-pills nav-justified mb-5" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active" id="pills-mission-tab" data-bs-toggle="pill" data-bs-target="#pills-mission" type="button" role="tab" aria-controls="pills-mission" aria-selected="true">Mission</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="pills-features-tab" data-bs-toggle="pill" data-bs-target="#pills-features" type="button" role="tab" aria-controls="pills-features" aria-selected="false">Features</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="pills-team-tab" data-bs-toggle="pill" data-bs-target="#pills-team" type="button" role="tab" aria-controls="pills-team" aria-selected="false">Team</button>
+                    </li>
+                  </ul>
+                  <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-mission" role="tabpanel" aria-labelledby="pills-mission-tab">
+                        At GeoQuest, our mission is to provide you with the tools and resources you need to create captivating, 
+                        interactive scavenger hunts that will delight and engage participants. Whether you're planning an engaging activity for students, a team-building experience for colleagues, 
+                        or just a fun adventure with friends, GeoQuest offers a flexible framework to get you started.
+                        
+                    </div>
+                    <div class="tab-pane fade" id="pills-features" role="tabpanel" aria-labelledby="pills-features-tab">
+                        <ul>
+                            <li><strong>Customizable Scavenger Hunts:</strong> Easily create your scavenger hunt by defining locations, clues, and challenges using the Google Maps API.</li>
+                            <br><li><strong>Leaderboard System:</strong> Rank participants based upon various criteria.</li>
+                            <br><li><strong>Interactive Map:</strong> Display an engaging map to guide participants and showcase important hunt-related information.</li>
+                            <br><li><strong>User-friendly Interface:</strong> A straightforward web interface for participants to interact with during the scavenger hunt.</li>
+                            <br><li><strong>Community Forums:</strong> Interact with like-minded adventurers who want to share ideas, tips, and success stories.</li>
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="pills-team" role="tabpanel" aria-labelledby="pills-team-tab">
+                        GeoQuest is a project born out of a shared passion for exploration, learning, and fun. We're a team of dedicated individuals who believe that learning should be an exciting journey 
+                        and that adventures are best when shared. We've combined our expertise in technology, education, and interactive experiences to bring you a project that's all about turning 
+                        your campus visit into a treasure hunt.
+                        <table class="table table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Computing ID</th>
+                                    <th scope="col">Role</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <th scope="row">Gabe Silverstein</th>
+                                    <th>jgb9fz</th>
+                                    <th>Scrum Master</th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Janice Guo</th>
+                                    <th>vdq8tp</th>
+                                    <th>DevOps Manager</th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Gabriel Gladstone</th>
+                                    <th>zwy7ce</th>
+                                    <th>Testing Manager</th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Brian Xiao</th>
+                                    <th>qhu2fg</th>
+                                    <th>Requirements Manager</th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Shruthi Kalathur</th>
+                                    <th>wxs2qx</th>
+                                    <th>UX Designer</th>
+                                </tr>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+
+        {% include "footer.html" %}
+    </body>
+</html>
