@@ -33,7 +33,7 @@ Setting up a Virtual Environment:
 
 To set up and run your scavenger hunt using GeoQuest, follow these simple steps:
 
-1. __Clone the Repository:__ Clone this repository to your local machine by entering ```git clone https://github.com/uva-cs3240-f23/project-b-12.git``` into a terminal
+1. __Clone the Repository:__ Clone this repository to your local machine by entering ```git clone https://github.com/gladstone-9/GeoQuest.git``` into a terminal
 
 2. __Configuration:__ Configure your Google Maps API credentials and other settings in the project files.
 
